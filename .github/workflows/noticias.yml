@@ -2,8 +2,7 @@
 name: Noticias do setor
 
 on:
-  schedule:
-    - cron: "0 15 * * *" # 12:00 em Natal (UTC-3). O GitHub pode atrasar alguns minutos.
+  # Agendamento desativado: o envio diário das 12:00 e o botão agora rodam no Supabase (função leonette-noticias).
   workflow_dispatch: # botão "Run workflow" para testar na hora
 
 jobs:
