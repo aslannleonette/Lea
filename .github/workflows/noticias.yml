@@ -1,0 +1,21 @@
+# Salve como .github/workflows/noticias.yml (junto com noticias.mjs na raiz do repositório)
+name: Noticias do setor
+
+on:
+  schedule:
+    - cron: "0 15 * * *" # 12:00 em Natal (UTC-3). O GitHub pode atrasar alguns minutos.
+  workflow_dispatch: # botão "Run workflow" para testar na hora
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node noticias.mjs
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
