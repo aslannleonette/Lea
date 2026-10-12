@@ -1,0 +1,52 @@
+name: Test Bot
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verificar secrets
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set -e
+
+          if [ -z "$TELEGRAM_BOT_TOKEN" ]; then
+            echo "TELEGRAM_BOT_TOKEN não foi encontrado"
+            exit 1
+          fi
+
+          if [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "TELEGRAM_CHAT_ID não foi encontrado"
+            exit 1
+          fi
+
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "OPENAI_API_KEY não foi encontrado"
+            exit 1
+          fi
+
+          echo "Secrets validados."
+
+      - name: Enviar mensagem de teste no Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          set -e
+          curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=Teste do bot Lea: mensagem enviada com sucesso!"
+
+      - name: Verificar API da OpenAI
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set -e
+          curl -sS -H "Authorization: Bearer ${OPENAI_API_KEY}" \
+            -H "Content-Type: application/json" \
+            https://api.openai.com/v1/models | jq -r '.data[0].id' | head
