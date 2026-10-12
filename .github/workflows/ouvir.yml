@@ -1,0 +1,26 @@
+# Confere o Telegram a cada ~5 min e responde ao botão "📰 Notícias agora".
+name: Ouvir pedidos
+
+on:
+  schedule:
+    - cron: "*/5 * * * *" # o GitHub pode atrasar alguns minutos
+  workflow_dispatch:
+
+concurrency:
+  group: ouvir
+  cancel-in-progress: false
+
+jobs:
+  ouvir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node ouvir.mjs
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
